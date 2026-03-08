@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-03-09T01:32:21",
+  "profiles": {
+    "rick": {
+      "display_name": "rick",
+      "last_seen": "2026-03-09T01:32:21",
+      "audio_effects": {
+        "radio": "off",
+        "reverb": "off",
+        "distortion": "off",
+        "telephone": "off",
+        "robot_voice": "off",
+        "cheap_mic": "off",
+        "underwater": "off",
+        "megaphone": "off",
+        "worn_tape": "off",
+        "intercom": "off",
+        "alien": "off",
+        "cave": "off",
+        "inner_thoughts": "off",
+        "add_noise": "off"
+      },
+      "flags": {
+        "fmsu": false,
+        "reverse": false
+      }
+    },
+    "sarah": {
+      "display_name": "sarah",
+      "last_seen": "2026-03-09T01:32:21",
+      "audio_effects": {
+        "radio": "off",
+        "reverb": "off",
+        "distortion": "off",
+        "telephone": "off",
+        "robot_voice": "off",
+        "cheap_mic": "off",
+        "underwater": "off",
+        "megaphone": "off",
+        "worn_tape": "off",
+        "intercom": "off",
+        "alien": "off",
+        "cave": "off",
+        "inner_thoughts": "off",
+        "add_noise": "off"
+      },
+      "flags": {
+        "fmsu": false,
+        "reverse": false
+      }
+    },
+    "bonaparte": {
+      "display_name": "bonaparte",
+      "last_seen": "2026-03-09T01:32:21",
+      "audio_effects": {
+        "radio": "off",
+        "reverb": "off",
+        "distortion": "off",
+        "telephone": "off",
+        "robot_voice": "off",
+        "cheap_mic": "off",
+        "underwater": "off",
+        "megaphone": "off",
+        "worn_tape": "off",
+        "intercom": "off",
+        "alien": "off",
+        "cave": "off",
+        "inner_thoughts": "off",
+        "add_noise": "off"
+      },
+      "flags": {
+        "fmsu": false,
+        "reverse": false
+      }
+    },
+    "mack": {
+      "display_name": "mack",
+      "last_seen": "2026-03-09T01:32:21",
+      "audio_effects": {
+        "radio": "off",
+        "reverb": "off",
+        "distortion": "off",
+        "telephone": "off",
+        "robot_voice": "off",
+        "cheap_mic": "off",
+        "underwater": "off",
+        "megaphone": "off",
+        "worn_tape": "off",
+        "intercom": "off",
+        "alien": "off",
+        "cave": "off",
+        "inner_thoughts": "off",
+        "add_noise": "off"
+      },
+      "flags": {
+        "fmsu": false,
+        "reverse": false
+      }
+    },
+    "Ungrouped": {
+      "display_name": "Ungrouped",
+      "last_seen": "2026-03-09T01:32:21",
+      "audio_effects": {
+        "radio": "off",
+        "reverb": "off",
+        "distortion": "off",
+        "telephone": "off",
+        "robot_voice": "off",
+        "cheap_mic": "off",
+        "underwater": "off",
+        "megaphone": "off",
+        "worn_tape": "off",
+        "intercom": "off",
+        "alien": "off",
+        "cave": "off",
+        "inner_thoughts": "off",
+        "add_noise": "off"
+      },
+      "flags": {
+        "fmsu": false,
+        "reverse": false
+      }
+    }
+  }
+}

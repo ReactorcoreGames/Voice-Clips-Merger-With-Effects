@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "ui": {
+    "last_output_folder": "C:/Users/Mongoose/Desktop/testing/speakers",
+    "last_clips_folder": "C:/Users/Mongoose/Desktop/testing/speakers",
+    "last_project_name": "testing2"
+  },
+  "settings": {
+    "default_gap_ms": 0,
+    "trim_leading": false,
+    "trim_trailing": false,
+    "output_format": "mp3",
+    "output_bitrate": "128k",
+    "loudnorm_lufs": -14,
+    "reverb_room_size": 0.5,
+    "distortion_drive": 0.5,
+    "noise_intensity": 0.5
+  }
+}
