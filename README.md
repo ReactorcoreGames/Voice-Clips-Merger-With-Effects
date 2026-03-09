@@ -1,10 +1,18 @@
+
+![vcme_promo1](https://github.com/user-attachments/assets/5f7e2318-69a8-48cc-8ef0-d35f6cebf6b3)
+
 # Voice Clips Merger With Effects (VCME)
 
 Batch-process pre-recorded voice clips with FFMPEG audio effects and merge them into a finished audio file.
 
+Get it here: https://reactorcore.itch.io/voice-clips-merger-with-effects
+
 **Made by Reactorcore** — https://linktr.ee/reactorcore
 
 ---
+
+<img width="1920" height="1020" alt="vcme screenshot (1)" src="https://github.com/user-attachments/assets/276b6d2e-dc51-4ac8-a8e6-bfea94d7e266" />
+
 
 ## What You Need
 
