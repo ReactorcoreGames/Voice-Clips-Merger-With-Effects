@@ -12,7 +12,7 @@ Batch-process your recorded audio clips with FFMPEG effects and merge them into 
 
 ## Description
 
-VCME is a desktop tool for post-processing pre-recorded voice clips. Drop a folder of audio files in, set effects per speaker, hit Generate — out comes a finished merged audio file with all your clips processed, paced, and loudness-normalized.
+VCME is a desktop tool for post-processing pre-recorded voice clips. Select a folder of audio files in, set effects per speaker, hit Generate — out comes a finished merged audio file with all your clips processed, paced, and loudness-normalized.
 
 Runs fully offline. Bring your own recordings — from voice actors, your own mic, AI voice generators, anywhere — and VCME handles the rest.
 
