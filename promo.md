@@ -8,13 +8,13 @@ Voice Clips Merger With Effects (VCME)
 
 ## Subtitle
 
-Batch-process recorded audio clips with FFMPEG effects and merge them into finished audio — no TTS, no subscriptions, no fuss.
+Batch-process your recorded audio clips with FFMPEG effects and merge them into finished, loudness-normalized audio — right from your desktop.
 
 ## Description
 
 VCME is a desktop tool for post-processing pre-recorded voice clips. Drop a folder of audio files in, set effects per speaker, hit Generate — out comes a finished merged audio file with all your clips processed, paced, and loudness-normalized.
 
-No text-to-speech. No internet connection needed. Bring your own recordings — from Edge-TTS, ElevenLabs, real voice actors, your own mic, anywhere.
+Runs fully offline. Bring your own recordings — from voice actors, your own mic, AI voice generators, anywhere — and VCME handles the rest.
 
 **Speaker grouping** — tag filenames with `_@SpeakerName` anywhere in the stem and each speaker gets their own independent effects panel. Place the tag mid-filename so clips sort naturally by scene or number while still grouping by speaker — no more alphabetic clumping. No tags? All clips share a single global panel.
 

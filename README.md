@@ -21,7 +21,7 @@ Run `pip install -r requirements.txt` once, then `python app.py`.
 ## What It Does
 
 VCME takes a folder of pre-recorded audio clips, applies FFMPEG effect chains per speaker,
-and produces merged output files. No text-to-speech — bring your own recordings.
+and produces merged output files. Runs fully offline — bring your own recordings.
 
 - Applies per-speaker audio effects to each clip (Radio, Reverb, Distortion, and more).
 - Saves effects-processed clips to `clips_effect/`.
