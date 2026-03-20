@@ -6,6 +6,7 @@ Project name, output folder, generate button, progress, log.
 
 import tkinter as tk
 import ttkbootstrap as ttk
+from tkinter import ttk as _tk_ttk
 from ttkbootstrap.constants import *
 
 from config import APP_THEME, MAX_PROJECT_NAME_LENGTH, INVALID_FILENAME_CHARS
@@ -62,7 +63,7 @@ class Tab3Builder:
 
     def _build_project_config_section(self, parent):
         """Build project name and output folder configuration."""
-        frame = ttk.LabelFrame(parent, text="Project Configuration", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Project Configuration", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         name_row = ttk.Frame(frame)
@@ -100,7 +101,7 @@ class Tab3Builder:
 
     def _build_generation_controls(self, parent):
         """Build generate/cancel buttons and progress bar."""
-        frame = ttk.LabelFrame(parent, text="Generation", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Generation", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         btn_row = ttk.Frame(frame)
@@ -135,7 +136,7 @@ class Tab3Builder:
 
     def _build_generation_log(self, parent):
         """Build the scrolling generation log."""
-        frame = ttk.LabelFrame(parent, text="Generation Log", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Generation Log", padding=10)
         frame.pack(fill=BOTH, expand=True, pady=(0, 10))
 
         log_container = ttk.Frame(frame)

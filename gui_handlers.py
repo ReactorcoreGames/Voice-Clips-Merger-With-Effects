@@ -195,6 +195,7 @@ class GUIHandlers:
             effect_settings[effect_name] = vars_dict.get(effect_name, tk.StringVar()).get() if effect_name in vars_dict else "off"
         effect_settings["fmsu"] = vars_dict["fmsu"].get()
         effect_settings["reverse"] = vars_dict["reverse"].get()
+        effect_settings["pitch_shift"] = vars_dict["pitch_multiplier"].get() / 100.0
 
         # Inject tweak settings
         effect_settings["_reverb_room_size"] = self.config_manager.get_setting("reverb_room_size")
@@ -203,8 +204,7 @@ class GUIHandlers:
 
         output_format = self.config_manager.get_setting("output_format")
         output_bitrate = self.config_manager.get_setting("output_bitrate")
-        trim_leading = self.config_manager.get_setting("trim_leading")
-        trim_trailing = self.config_manager.get_setting("trim_trailing")
+        silence_trim_mode = self.config_manager.get_silence_trim("mode") or "off"
 
         if hasattr(self, 'status_label'):
             self.status_label.config(text=f"Processing test clip for {speaker_id}...")
@@ -233,8 +233,7 @@ class GUIHandlers:
                     clip_path, str(out_path),
                     effect_settings,
                     config_manager=self.config_manager,
-                    trim_leading=trim_leading,
-                    trim_trailing=trim_trailing,
+                    silence_trim_mode=silence_trim_mode,
                     output_format=output_format,
                     output_bitrate=output_bitrate,
                 )

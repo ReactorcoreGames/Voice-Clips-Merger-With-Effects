@@ -6,12 +6,14 @@ Per-speaker (or global) audio effect panels + Test clip button.
 
 import tkinter as tk
 import ttkbootstrap as ttk
+from tkinter import ttk as _tk_ttk
 from ttkbootstrap.constants import *
 
 from config import (
     APP_THEME, AUDIO_EFFECTS, EFFECT_LEVELS,
     ALIEN_VARIANTS, CAVE_VARIANTS,
     INNER_THOUGHTS_EFFECT_VARIANTS, ADD_NOISE_VARIANTS,
+    PITCH_MULTIPLIER_MIN, PITCH_MULTIPLIER_MAX, PITCH_MULTIPLIER_DEFAULT,
 )
 
 try:
@@ -163,7 +165,7 @@ class Tab2Builder:
     def _build_speaker_panel(self, parent, speaker_id, profile, panel_label=None):
         """Build a single speaker effect configuration panel."""
         label_text = panel_label or f"  {speaker_id}  "
-        frame = ttk.LabelFrame(parent, text=label_text, padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text=label_text, padding=10)
         frame.pack(fill=X, pady=(0, 8))
 
         vars_dict = self._create_speaker_vars(speaker_id, profile)
@@ -228,7 +230,7 @@ class Tab2Builder:
             self._build_effect_row(col, effect_name, effect_data,
                                    vars_dict[effect_name], levels=levels)
 
-        # --- Flags row ---
+        # --- Flags row (FMSU, Reverse, Pitch ×) ---
         flags_row = ttk.Frame(frame)
         flags_row.pack(fill=X, pady=(6, 0))
 
@@ -237,8 +239,41 @@ class Tab2Builder:
         _tip(fmsu_cb, "F*** My Sh** Up — brutal digital corruption applied last.")
 
         reverse_cb = ttk.Checkbutton(flags_row, text="Reverse", variable=vars_dict["reverse"])
-        reverse_cb.pack(side=LEFT)
+        reverse_cb.pack(side=LEFT, padx=(0, 30))
         _tip(reverse_cb, "Reverse the clip. Applied last, after all other effects.")
+
+        # Pitch × slider (rubberband multiplier, stored as int*100)
+        pitch_lbl = ttk.Label(flags_row, text="Pitch \u00d7:",
+                              font=("Consolas", 9, "bold"))
+        pitch_lbl.pack(side=LEFT, padx=(0, 4))
+        _tip(pitch_lbl,
+             "Pitch shift via FFMPEG rubberband. Multiplier \u00d70.5\u2013\u00d72.0 (default \u00d71.0 = no shift).\n"
+             "<1.0 = lower pitch. >1.0 = higher pitch. Applied independently of speed.")
+
+        pitch_disp_var = tk.StringVar(
+            value=f"\u00d7{vars_dict['pitch_multiplier'].get() / 100:.2f}")
+        widgets_dict["pitch_disp_var"] = pitch_disp_var
+
+        def _fmt_pitch(v, pv=vars_dict["pitch_multiplier"]):
+            pv.set(int(round(float(v))))
+
+        pitch_slider = ttk.Scale(
+            flags_row,
+            from_=int(PITCH_MULTIPLIER_MIN * 100),
+            to=int(PITCH_MULTIPLIER_MAX * 100),
+            variable=vars_dict["pitch_multiplier"],
+            orient=HORIZONTAL, length=140,
+            command=_fmt_pitch,
+        )
+        pitch_slider.pack(side=LEFT, padx=(0, 4))
+
+        pitch_disp = ttk.Label(flags_row, textvariable=pitch_disp_var,
+                               font=("Consolas", 9), width=6)
+        pitch_disp.pack(side=LEFT)
+
+        def _update_pitch_disp(*_, pv=vars_dict["pitch_multiplier"], dv=pitch_disp_var):
+            dv.set(f"\u00d7{pv.get() / 100:.2f}")
+        vars_dict["pitch_multiplier"].trace_add("write", _update_pitch_disp)
 
     def _build_effect_row(self, parent, effect_name, effect_data, var, levels=None):
         """Build a single effect control row with radio buttons."""
@@ -270,6 +305,7 @@ class Tab2Builder:
 
         vars_dict["fmsu"] = tk.BooleanVar(value=profile.fmsu)
         vars_dict["reverse"] = tk.BooleanVar(value=profile.reverse)
+        vars_dict["pitch_multiplier"] = tk.IntVar(value=getattr(profile, "pitch_multiplier", 100))
 
         for var in vars_dict.values():
             var.trace_add("write",
@@ -292,5 +328,6 @@ class Tab2Builder:
 
         profile.fmsu = vars_dict["fmsu"].get()
         profile.reverse = vars_dict["reverse"].get()
+        profile.pitch_multiplier = vars_dict["pitch_multiplier"].get()
 
         self.char_profiles.update_profile(speaker_id, profile)

@@ -13,6 +13,7 @@ from config import (
     VCME_SETTINGS_DEFAULTS,
     INNER_THOUGHTS_PRESETS,
     INNER_THOUGHTS_DEFAULT_PRESET,
+    SILENCE_TRIM_DEFAULTS,
 )
 
 CURRENT_SCHEMA_VERSION = 2
@@ -32,6 +33,7 @@ def _build_defaults():
         "schema_version": CURRENT_SCHEMA_VERSION,
         "ui": dict(UI_DEFAULTS),
         "settings": dict(VCME_SETTINGS_DEFAULTS),
+        "silence_trim": dict(SILENCE_TRIM_DEFAULTS),
     }
 
 
@@ -47,7 +49,7 @@ def _validate_and_fill(config):
     """Validate a loaded config dict; fill missing keys with defaults."""
     defaults = _build_defaults()
 
-    for section in ("ui", "settings"):
+    for section in ("ui", "settings", "silence_trim"):
         if section not in config or not isinstance(config[section], dict):
             config[section] = dict(defaults[section])
         else:
@@ -65,6 +67,12 @@ def _validate_and_fill(config):
     s["reverb_room_size"] = _clamp(s.get("reverb_room_size", 0.5), 0.0, 1.0)
     s["distortion_drive"] = _clamp(s.get("distortion_drive", 0.5), 0.0, 1.0)
     s["noise_intensity"] = _clamp(s.get("noise_intensity", 0.5), 0.0, 1.0)
+
+    # Validate silence_trim
+    valid_modes = ("off", "beginning", "end", "beginning_end", "all")
+    st = config["silence_trim"]
+    if st.get("mode") not in valid_modes:
+        st["mode"] = SILENCE_TRIM_DEFAULTS["mode"]
 
     config.setdefault("schema_version", CURRENT_SCHEMA_VERSION)
     return config
@@ -144,6 +152,25 @@ class ConfigManager:
 
     def set_setting(self, key, value):
         self.config["settings"][key] = value
+        self.save()
+
+    # ── Silence trimming ──────────────────────────────────────
+
+    def get_silence_trim(self, key: str):
+        """Get a silence_trim config value."""
+        return self.config.get("silence_trim", {}).get(
+            key, SILENCE_TRIM_DEFAULTS.get(key)
+        )
+
+    def set_silence_trim(self, key: str, value):
+        """Set a silence_trim config value and save."""
+        self.config.setdefault("silence_trim", dict(SILENCE_TRIM_DEFAULTS))
+        self.config["silence_trim"][key] = value
+        self.save()
+
+    def reset_silence_trim_to_defaults(self):
+        """Reset silence_trim section to defaults."""
+        self.config["silence_trim"] = dict(SILENCE_TRIM_DEFAULTS)
         self.save()
 
     # ── Inner thoughts filter (used by audio_generator) ────────

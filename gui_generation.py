@@ -104,6 +104,8 @@ class GenerationMixin:
                 effects[eff_name] = vars_dict[eff_name].get() if eff_name in vars_dict else "off"
             effects["fmsu"] = vars_dict["fmsu"].get()
             effects["reverse"] = vars_dict["reverse"].get()
+            # pitch_multiplier stored as int*100 → convert to float for audio_generator
+            effects["pitch_shift"] = vars_dict["pitch_multiplier"].get() / 100.0
             speakers[speaker_id] = {
                 "effects": effects,
             }
@@ -112,6 +114,8 @@ class GenerationMixin:
         reverb_room_size = self.config_manager.get_setting("reverb_room_size")
         distortion_drive = self.config_manager.get_setting("distortion_drive")
         noise_intensity = self.config_manager.get_setting("noise_intensity")
+
+        silence_trim_mode = self.config_manager.get_silence_trim("mode") or "off"
 
         return {
             "project_name": project_name,
@@ -123,8 +127,7 @@ class GenerationMixin:
             "output_format": self.config_manager.get_setting("output_format"),
             "output_bitrate": self.config_manager.get_setting("output_bitrate"),
             "loudnorm_lufs": self.config_manager.get_setting("loudnorm_lufs"),
-            "trim_leading": self.config_manager.get_setting("trim_leading"),
-            "trim_trailing": self.config_manager.get_setting("trim_trailing"),
+            "silence_trim_mode": silence_trim_mode,
             "reverb_room_size": reverb_room_size,
             "distortion_drive": distortion_drive,
             "noise_intensity": noise_intensity,
@@ -149,8 +152,7 @@ class GenerationMixin:
         output_format = settings["output_format"]
         output_bitrate = settings["output_bitrate"]
         loudnorm_lufs = settings["loudnorm_lufs"]
-        trim_leading = settings["trim_leading"]
-        trim_trailing = settings["trim_trailing"]
+        silence_trim_mode = settings.get("silence_trim_mode", "off")
 
         # Inject tweak settings into effect dicts
         tweaks = {
@@ -217,8 +219,7 @@ class GenerationMixin:
                 clip.full_path, str(effect_path),
                 effect_settings,
                 config_manager=config_manager,
-                trim_leading=trim_leading,
-                trim_trailing=trim_trailing,
+                silence_trim_mode=silence_trim_mode,
                 output_format=output_format,
                 output_bitrate=output_bitrate,
             )

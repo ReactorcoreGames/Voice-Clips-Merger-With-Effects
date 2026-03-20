@@ -269,6 +269,17 @@ INNER_THOUGHTS_FILTER = (
     "volume=0.95"
 )
 
+# Pitch multiplier constants (stored as int*100 in tk.IntVar)
+PITCH_MULTIPLIER_MIN = 0.5
+PITCH_MULTIPLIER_MAX = 2.0
+PITCH_MULTIPLIER_DEFAULT = 1.0
+
+# Silence trim defaults (stored in config.json under "silence_trim" key)
+# Default: "off" — real recordings usually have natural room tone that should be kept.
+SILENCE_TRIM_DEFAULTS = {
+    "mode": "off",   # off / beginning / end / beginning_end / all
+}
+
 # Characters invalid in filenames and JSON keys
 INVALID_FILENAME_CHARS = set('<>:"/\\|?*')
 # Characters allowed in speaker IDs: alphanumeric, spaces, hyphens, underscores

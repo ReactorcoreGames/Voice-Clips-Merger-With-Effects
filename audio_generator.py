@@ -30,24 +30,23 @@ class AudioGenerator:
 
     def apply_audio_effects(self, input_path, output_path, effect_settings,
                             config_manager=None,
-                            trim_leading=False,
-                            trim_trailing=False,
+                            silence_trim_mode="off",
                             output_format="mp3",
                             output_bitrate="128k"):
         """
         Apply audio effects to a clip using FFMPEG.
 
         Pipeline:
-        0.  (optional) Trim leading silence
-        0b. (optional) Trim trailing silence
-        1.  Frequency-based effects (radio, telephone, cheap_mic, underwater, megaphone, worn_tape)
-        2.  Ring-mod / pitch character effects (robot_voice, alien)
-        3.  Spatial / echo effects (reverb, cave)
-        4.  Distortion (applied last — needs hot signal)
-        5.  Inner Thoughts filter (if active)
-        5b. Soft limiting
-        6.  FMSU (if active)
-        7.  Reverse (if active)
+        0.   Silence trim (configurable mode — off / beginning / end / beginning_end / all)
+        1.   Frequency-based effects (radio, telephone, cheap_mic, underwater, megaphone, worn_tape)
+        2.   Ring-mod / pitch character effects (robot_voice, alien)
+        3.   Spatial / echo effects (reverb, cave)
+        3.5. Pitch shift via rubberband (pitch_multiplier float, 1.0 = no shift)
+        4.   Distortion (applied last — needs hot signal)
+        5.   Inner Thoughts filter (if active)
+        5b.  Soft limiting
+        6.   FMSU (if active)
+        7.   Reverse (if active)
         Add Noise is handled via filter_complex (mixed in alongside voice chain).
 
         Args:
@@ -55,8 +54,7 @@ class AudioGenerator:
             output_path: Path for processed output.
             effect_settings: Dict mapping effect names to preset values.
             config_manager: ConfigManager instance (for inner thoughts filter building).
-            trim_leading: If True, remove head silence.
-            trim_trailing: If True, remove tail silence.
+            silence_trim_mode: One of "off" / "beginning" / "end" / "beginning_end" / "all".
             output_format: Output file format (mp3/ogg/flac/wav/m4a).
             output_bitrate: Bitrate string for lossy formats (e.g. "128k").
 
@@ -68,17 +66,10 @@ class AudioGenerator:
         try:
             filters = []
 
-            # STAGE 0: Optional silence trimming
-            if trim_leading:
-                filters.append(
-                    "silenceremove="
-                    "start_periods=1:start_silence=0:start_threshold=-50dB"
-                )
-            if trim_trailing:
-                filters.append(
-                    "silenceremove="
-                    "stop_periods=1:stop_silence=0.1:stop_threshold=-50dB"
-                )
+            # STAGE 0: Silence trimming
+            silence_filter = _build_silence_filter(silence_trim_mode)
+            if silence_filter:
+                filters.append(silence_filter)
 
             # STAGE 1: Frequency-based effects
             for effect_name in ["radio", "telephone", "cheap_mic",
@@ -113,6 +104,15 @@ class AudioGenerator:
                 f = AUDIO_EFFECTS["cave"]["presets"].get(cave_level, "")
                 if f:
                     filters.append(f)
+
+            # STAGE 3.5: Pitch shift via rubberband (true pitch/tempo independence)
+            ps_val = effect_settings.get("pitch_shift", 1.0)
+            try:
+                ps_multiplier = float(ps_val)
+                if ps_multiplier != 1.0:
+                    filters.append(f"rubberband=pitch={ps_multiplier:.4f}")
+            except (TypeError, ValueError):
+                pass
 
             # STAGE 4: Distortion (hot signal needed)
             dist_level = effect_settings.get("distortion", "off")
@@ -280,6 +280,62 @@ class AudioGenerator:
 
 
 # ── Effect filter builders ────────────────────────────────────────────────────
+
+def _build_silence_filter(mode: str) -> str:
+    """
+    Build the FFMPEG filter string for Stage 0 silence trimming.
+    Returns empty string when mode is "off" (caller skips the filter entirely).
+
+    mode values: "off" / "beginning" / "end" / "beginning_end" / "all"
+
+    Both start and end trim use a fixed -35 dB threshold.
+    End trim uses the areverse sandwich (reverse → silenceremove start → reverse)
+    rather than stop_periods, which can prematurely cut expressive voice tails.
+    """
+    if mode == "off":
+        return ""
+
+    trim_start = mode in ("beginning", "beginning_end", "all")
+    trim_end   = mode in ("end", "beginning_end")
+    trim_all   = mode == "all"
+
+    START_FILTER = (
+        "silenceremove="
+        "start_periods=1:"
+        "start_silence=0.02:"
+        "start_threshold=-35dB:"
+        "stop_periods=0"
+    )
+    # End trim: reverse, strip leading silence (= original trailing silence), reverse back.
+    END_FILTER = (
+        "areverse,"
+        "silenceremove="
+        "start_periods=1:"
+        "start_silence=0.02:"
+        "start_threshold=-35dB:"
+        "stop_periods=0,"
+        "areverse"
+    )
+    # "all" mode: strip mid-clip silence after start trim.
+    ALL_MID_FILTER = (
+        "silenceremove="
+        "start_periods=0:"
+        "stop_periods=-1:"
+        "stop_silence=0.1:"
+        "stop_threshold=-80dB"
+    )
+
+    filters = []
+    if trim_start:
+        filters.append(START_FILTER)
+    if trim_end:
+        filters.append(END_FILTER)
+    elif trim_all:
+        filters.append(ALL_MID_FILTER)
+        filters.append(END_FILTER)
+
+    return ",".join(filters)
+
 
 def _build_reverb_filter(level: str, room_size: float) -> str:
     """

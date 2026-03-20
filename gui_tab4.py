@@ -9,10 +9,11 @@ import subprocess
 import sys
 import tkinter as tk
 import ttkbootstrap as ttk
+from tkinter import ttk as _tk_ttk
 from pathlib import Path
 from ttkbootstrap.constants import *
 
-from config import APP_THEME, VCME_SETTINGS_DEFAULTS
+from config import APP_THEME, VCME_SETTINGS_DEFAULTS, SILENCE_TRIM_DEFAULTS
 
 try:
     from ttkbootstrap.tooltip import ToolTip
@@ -80,7 +81,7 @@ class Tab4Builder:
     # ── Section 1: Pause gap ────────────────────────────────────────────────
 
     def _build_pause_section(self, parent):
-        frame = ttk.LabelFrame(parent, text="Pause Settings", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Pause Settings", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         ttk.Label(frame,
@@ -125,41 +126,54 @@ class Tab4Builder:
     # ── Section 2: Silence trim ─────────────────────────────────────────────
 
     def _build_trim_section(self, parent):
-        frame = ttk.LabelFrame(parent, text="Silence Trimming", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Silence Trimming", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         ttk.Label(frame,
-                  text="Optionally remove silence from the start or end of each clip before processing.\n"
-                       "Off by default — real recordings rarely need aggressive silence removal.",
+                  text="Remove silence from clips before processing. Off by default — "
+                       "real recordings often have intentional room tone that should be kept.",
                   font=("Segoe UI", 10), foreground="#C090B8",
                   wraplength=880).pack(anchor=W, pady=(0, 8))
 
-        trim_lead = self.config_manager.get_setting("trim_leading")
-        trim_trail = self.config_manager.get_setting("trim_trailing")
+        current_mode = self.config_manager.get_silence_trim("mode") or "off"
+        self._silence_trim_mode_var = tk.StringVar(value=current_mode)
 
-        self._trim_leading_var = tk.BooleanVar(value=bool(trim_lead))
-        self._trim_trailing_var = tk.BooleanVar(value=bool(trim_trail))
+        modes = [
+            ("off",            "Off  \u2190 default"),
+            ("beginning",      "Start only  (strip head silence)"),
+            ("end",            "End only  (strip tail silence)"),
+            ("beginning_end",  "Start and End  (strip both)"),
+            ("all",            "All  (strip head, tail, and mid-clip silence at \u221280 dB)"),
+        ]
 
-        lead_cb = ttk.Checkbutton(frame, text="Trim leading silence  (removes head silence at clip start)",
-                                   variable=self._trim_leading_var,
-                                   command=lambda: self.config_manager.set_setting(
-                                       "trim_leading", self._trim_leading_var.get()))
-        lead_cb.pack(anchor=W, pady=(0, 4))
-        _tip(lead_cb, "Uses silenceremove start_periods=1 — removes one block of silence at the head.\n"
-                      "Safe for real recordings. Threshold: -50 dB.")
+        for value, label in modes:
+            rb = ttk.Radiobutton(frame, text=label,
+                                 variable=self._silence_trim_mode_var, value=value,
+                                 command=self._on_silence_trim_mode_changed,
+                                 bootstyle="info")
+            rb.pack(anchor=W, pady=1)
 
-        trail_cb = ttk.Checkbutton(frame, text="Trim trailing silence  (removes tail silence at clip end)",
-                                    variable=self._trim_trailing_var,
-                                    command=lambda: self.config_manager.set_setting(
-                                        "trim_trailing", self._trim_trailing_var.get()))
-        trail_cb.pack(anchor=W)
-        _tip(trail_cb, "Uses silenceremove stop_periods=1 — removes the final trailing silence block only.\n"
-                       "Safe for real recordings. Does NOT use stop_periods=-1 (destructive for real audio).")
+        _tip(frame,
+             "Start/End trim: -35 dB threshold, 20 ms minimum silence duration.\n"
+             "End trim uses the areverse sandwich — immune to mid-clip amplitude dips.\n"
+             "All: additionally strips mid-clip silence at -80 dB (use with care on real recordings).")
+
+        ttk.Button(frame, text="Reset to Default",
+                   command=self._on_reset_silence_trim,
+                   bootstyle="warning-outline", width=18).pack(anchor=W, pady=(10, 4))
+
+    def _on_silence_trim_mode_changed(self):
+        mode = self._silence_trim_mode_var.get()
+        self.config_manager.set_silence_trim("mode", mode)
+
+    def _on_reset_silence_trim(self):
+        self.config_manager.reset_silence_trim_to_defaults()
+        self._silence_trim_mode_var.set(SILENCE_TRIM_DEFAULTS["mode"])
 
     # ── Section 3: Output format ────────────────────────────────────────────
 
     def _build_format_section(self, parent):
-        frame = ttk.LabelFrame(parent, text="Output Format", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Output Format", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         fmt_val = self.config_manager.get_setting("output_format")
@@ -251,7 +265,7 @@ class Tab4Builder:
     # ── Section 4: Effect tweaks ────────────────────────────────────────────
 
     def _build_tweaks_section(self, parent):
-        frame = ttk.LabelFrame(parent, text="Audio Effect Tweaks", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Audio Effect Tweaks", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         ttk.Label(frame,
@@ -329,7 +343,7 @@ class Tab4Builder:
     # ── Quick access ────────────────────────────────────────────────────────
 
     def _build_quick_access_section(self, parent):
-        frame = ttk.LabelFrame(parent, text="Quick Access", padding=10)
+        frame = _tk_ttk.LabelFrame(parent, text="Quick Access", padding=10)
         frame.pack(fill=X, pady=(0, 10))
 
         ttk.Label(frame, text="Open data files.",

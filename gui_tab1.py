@@ -6,6 +6,7 @@ Voice Clips Merger With Effects (VCME)
 import tkinter as tk
 from tkinter import scrolledtext
 import ttkbootstrap as ttk
+from tkinter import ttk as _tk_ttk
 from ttkbootstrap.constants import *
 
 from config import APP_THEME
@@ -55,7 +56,7 @@ class Tab1Builder:
                   font=("Segoe UI", 10)).pack(pady=(0, 15))
 
         # --- Folder picker ---
-        folder_frame = ttk.LabelFrame(scrollable, text="Clips Folder", padding=10)
+        folder_frame = _tk_ttk.LabelFrame(scrollable, text="Clips Folder", padding=10)
         folder_frame.pack(fill=X, pady=(0, 10))
 
         btn_row = ttk.Frame(folder_frame)
@@ -81,7 +82,7 @@ class Tab1Builder:
         self.loaded_folder_label.pack(anchor=W, pady=(0, 5))
 
         # --- Clip list ---
-        list_outer = ttk.LabelFrame(scrollable, text="Clip List", padding=10)
+        list_outer = _tk_ttk.LabelFrame(scrollable, text="Clip List", padding=10)
         list_outer.pack(fill=BOTH, expand=True, pady=(0, 10))
 
         # Enable/Disable All row
@@ -144,7 +145,7 @@ class Tab1Builder:
         self._clip_rows = []   # list of ttk.Frame for each row
 
         # --- Parse log ---
-        log_frame = ttk.LabelFrame(scrollable, text="Folder Log", padding=10)
+        log_frame = _tk_ttk.LabelFrame(scrollable, text="Folder Log", padding=10)
         log_frame.pack(fill=BOTH, expand=True, pady=(0, 10))
 
         self.parse_log = scrolledtext.ScrolledText(

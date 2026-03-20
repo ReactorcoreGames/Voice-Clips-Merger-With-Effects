@@ -31,6 +31,9 @@ class SpeakerProfile:
     fmsu: bool = False
     reverse: bool = False
 
+    # Pitch shift: float multiplier stored as int*100 (100 = ×1.0, no shift)
+    pitch_multiplier: int = 100  # range 50–200 (×0.5–×2.0)
+
     def to_dict(self):
         """Convert to dictionary for JSON serialization"""
         return {
@@ -55,6 +58,7 @@ class SpeakerProfile:
             "flags": {
                 "fmsu": self.fmsu,
                 "reverse": self.reverse,
+                "pitch_multiplier": self.pitch_multiplier,
             },
         }
 
@@ -83,6 +87,7 @@ class SpeakerProfile:
             add_noise=effects.get("add_noise", "off"),
             fmsu=flags.get("fmsu", False),
             reverse=flags.get("reverse", False),
+            pitch_multiplier=int(flags.get("pitch_multiplier", 100)),
         )
 
 
